@@ -9,8 +9,8 @@ import {
   XClose,
 } from './TemplateIcons.jsx'
 
-import logoPiagam from '../../images/logo-piagam.png'
-import logoPiagamTransparent from '../../images/logo-piagam2.png'
+import logoPiagam from '../../images/logo-piagam2.svg'
+import logoPiagamTransparent from '../../images/logo-piagam.svg'
 import {
   ALL_DEPARTMENTS_FILTER_ID,
   ALL_DEPARTMENTS_FILTER_LABEL,

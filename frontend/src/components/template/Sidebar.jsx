@@ -6,8 +6,7 @@ import {
   implementedNavigationPaths,
   primaryNavigationItems,
   secondaryNavigationItems,
-} from './navigation.js'
-import { submitLogout } from './logoutService.js'
+} from '../../services/templateServices/Navigation.js'
 import '../../styles/templateStyle/TemplateComponents.css'
 
 function getInitials(name) {
@@ -39,6 +38,10 @@ function getInitiallyExpandedGroups(items, currentPath) {
   return items.reduce((expandedGroups, item) => {
     if (item.children?.length && isItemActive(item, currentPath)) {
       expandedGroups[getGroupKey(item)] = true
+    }
+
+    if (item.children?.length) {
+      Object.assign(expandedGroups, getInitiallyExpandedGroups(item.children, currentPath))
     }
 
     return expandedGroups
@@ -176,12 +179,12 @@ function Sidebar({
   )
 
   const handleSelect = async (item) => {
-    if (item.href === '/logout') {
+    if (item.external && item.href) {
       if (mobileOpen) {
         onCloseMobile?.()
       }
 
-      await submitLogout()
+      window.location.assign(item.href)
       return
     }
 
@@ -303,6 +306,11 @@ function Sidebar({
             onToggleGroup={handleToggleGroup}
           />
         ))}
+      </div>
+
+      <div className="sidebar-copyright" aria-label="Copyright">
+        <p>&copy; 2026 PT Pilar Niaga Makmur</p>
+        <p>Developed by IT Team </p>
       </div>
     </aside>
   )

@@ -94,6 +94,16 @@ export function LogOut01(props) {
   )
 }
 
+export function LogOutLeft01(props) {
+  return (
+    <IconBase {...props}>
+      <path d="M15 21h4a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-4" />
+      <path d="m8 17-5-5 5-5" />
+      <path d="M3 12h12" />
+    </IconBase>
+  )
+}
+
 export function Menu01(props) {
   return (
     <IconBase {...props}>
@@ -163,6 +173,29 @@ export function Users01(props) {
       <circle cx="9" cy="7" r="4" />
       <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
       <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </IconBase>
+  )
+}
+
+export function Table01(props) {
+  return (
+    <IconBase {...props}>
+      <path d="M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5z" />
+      <path d="M3 9h18" />
+      <path d="M3 15h18" />
+      <path d="M9 9v12" />
+      <path d="M15 9v12" />
+    </IconBase>
+  )
+}
+
+export function Chart01(props) {
+  return (
+    <IconBase {...props}>
+      <path d="M3 3v18h18" />
+      <rect x="7" y="12" width="3" height="6" rx="1" />
+      <rect x="12" y="8" width="3" height="10" rx="1" />
+      <rect x="17" y="5" width="3" height="13" rx="1" />
     </IconBase>
   )
 }
