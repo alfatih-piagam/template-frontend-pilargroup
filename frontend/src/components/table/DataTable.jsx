@@ -1,5 +1,6 @@
 import { Fragment, isValidElement, useState } from 'react'
 
+import CreateButton from '../button/CreateButton.jsx'
 import { ChevronDown } from '../template/TemplateIcons.jsx'
 
 function getInitials(value = '') {
@@ -289,6 +290,7 @@ function DataTable({
                 const rowKey = String(rowId)
                 const safeRowId = sanitizeId(rowKey)
                 const isExpanded = visibleExpandedRowKey === rowKey
+                const isRowInteractive = hasDetail || typeof onRowClick === 'function'
                 const accordionId = `${idPrefix}-accordion-${safeRowId}`
                 const detailSections = getDetailSections(detail, row, index)
                 const detailTitle = resolveTemplateValue(detail?.title, row, index)
@@ -296,6 +298,7 @@ function DataTable({
                 const detailEyebrow = resolveTemplateValue(detail?.eyebrow, row, index)
                 const rowClassName = [
                   'users-table__row',
+                  isRowInteractive ? 'users-table__row--interactive' : '',
                   isExpanded ? 'users-table__row--expanded' : '',
                   getRowClassName?.(row, index),
                 ]
@@ -306,7 +309,9 @@ function DataTable({
                   <Fragment key={rowKey}>
                     <tr
                       className={rowClassName}
-                      onClick={() => handleRowClick(row, index, rowKey)}
+                      onClick={
+                        isRowInteractive ? () => handleRowClick(row, index, rowKey) : undefined
+                      }
                       onKeyDown={(event) => handleRowKeyDown(event, rowKey)}
                       tabIndex={hasDetail ? 0 : undefined}
                       aria-expanded={hasDetail ? isExpanded : undefined}
@@ -324,9 +329,9 @@ function DataTable({
 
                       {hasDetail ? (
                         <td className="users-table__detail-cell">
-                          <button
+                          <CreateButton
+                            variant="detail"
                             type="button"
-                            className="users-table__detail-button"
                             onClick={(event) => {
                               event.stopPropagation()
                               handleToggleRow(rowKey)
@@ -343,7 +348,7 @@ function DataTable({
                                 isExpanded ? ' users-table__detail-icon--open' : ''
                               }`}
                             />
-                          </button>
+                          </CreateButton>
                         </td>
                       ) : null}
                     </tr>
@@ -426,14 +431,11 @@ function DataTable({
                                   const Icon = action.icon
 
                                   return (
-                                    <button
+                                    <CreateButton
                                       key={action.key ?? action.label}
+                                      variant="accordion"
+                                      tone={action.variant === 'danger' ? 'danger' : 'default'}
                                       type="button"
-                                      className={`users-table__accordion-button${
-                                        action.variant === 'danger'
-                                          ? ' users-table__accordion-button--danger'
-                                          : ''
-                                      }`}
                                       disabled={action.disabled?.(row, index) ?? action.disabled}
                                       onClick={(event) => {
                                         event.stopPropagation()
@@ -442,7 +444,7 @@ function DataTable({
                                     >
                                       {Icon ? <Icon size={16} aria-hidden="true" /> : null}
                                       {action.label}
-                                    </button>
+                                    </CreateButton>
                                   )
                                 })}
                               </div>
@@ -494,28 +496,27 @@ function DataTable({
             className="users-table-pagination__controls"
             aria-label={pagination.ariaLabel ?? `${tableLabel} pagination`}
           >
-            <button
+            <CreateButton
+              variant="pagination"
               type="button"
-              className="users-table-pagination__button"
               onClick={pagination.onPrevious}
               disabled={pagination.currentPage === 1}
             >
               {pagination.previousLabel ?? 'Previous'}
-            </button>
+            </CreateButton>
 
             {(pagination.items ?? []).map((item, index) =>
               typeof item === 'number' ? (
-                <button
+                <CreateButton
                   key={item}
+                  variant="pagination"
+                  active={item === pagination.currentPage}
                   type="button"
-                  className={`users-table-pagination__button${
-                    item === pagination.currentPage ? ' users-table-pagination__button--active' : ''
-                  }`}
                   onClick={() => pagination.onSelect?.(item)}
                   aria-current={item === pagination.currentPage ? 'page' : undefined}
                 >
                   {item}
-                </button>
+                </CreateButton>
               ) : (
                 <span
                   key={`${item}-${index}`}
@@ -527,14 +528,14 @@ function DataTable({
               ),
             )}
 
-            <button
+            <CreateButton
+              variant="pagination"
               type="button"
-              className="users-table-pagination__button"
               onClick={pagination.onNext}
               disabled={pagination.currentPage === pagination.totalPages}
             >
               {pagination.nextLabel ?? 'Next'}
-            </button>
+            </CreateButton>
           </div>
         </div>
       ) : null}

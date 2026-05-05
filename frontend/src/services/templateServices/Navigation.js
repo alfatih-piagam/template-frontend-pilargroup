@@ -14,6 +14,7 @@ export const implementedNavigationPaths = [
   '/tickets',
   '/documents',
   '/Table',
+  '/TableActions',
   '/users',
   '/Chart',
 ]
@@ -49,8 +50,8 @@ export const primaryNavigationItems = [
       },
       {
         id: 'table-users',
-        label: 'Users Table',
-        href: '/users',
+        label: 'Data Table Actions',
+        href: '/TableActions',
       },
     ],
   },

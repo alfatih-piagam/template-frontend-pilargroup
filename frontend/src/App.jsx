@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 
 import BackgroundMain from './components/template/BackgroundMain.jsx'
+import DialogDelete from './components/Dialog/DialogDelete.jsx'
+import DialogEdit from './components/Dialog/DialogEdit.jsx'
 import Header from './components/template/Header.jsx'
 import Sidebar from './components/template/Sidebar.jsx'
 import DataTable, {
@@ -8,6 +10,9 @@ import DataTable, {
   DataTableIdentity,
   DataTableStatus,
 } from './components/table/DataTable.jsx'
+import DataTableAction from './components/table/DataTableAction.jsx'
+import ButtonMain from './components/button/ButtonMain.jsx'
+import ButtonRangeDate from './components/button/ButtonRangeDate.jsx'
 import BarChartPreview from './components/chart/BarChart.jsx'
 import DonutChartPreview from './components/chart/DonutChart.jsx'
 import HorizontalBarChartPreview from './components/chart/HorizontalBarChart.jsx'
@@ -48,6 +53,12 @@ const pageDetails = {
     value: '8',
     detail: 'Contoh komponen table dengan pencarian, detail row, action, dan pagination.',
   },
+  '/TableActions': {
+    title: 'Data Table Actions',
+    eyebrow: 'Table Template',
+    value: '8',
+    detail: 'Contoh komponen table dengan kolom action inline untuk edit dan delete.',
+  },
   '/Chart': {
     title: 'Chart',
     eyebrow: 'Visual Analytics',
@@ -74,7 +85,7 @@ const pageDetails = {
   },
 }
 
-const tablePagePaths = ['/Table', '/users']
+const tablePagePaths = ['/Table', '/TableActions', '/users']
 const USERS_PAGE_SIZE_OPTIONS = [5, 10, 25, 50]
 const DEFAULT_USERS_PAGE_SIZE = USERS_PAGE_SIZE_OPTIONS[0]
 
@@ -361,8 +372,11 @@ function App() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [lastUpdated, setLastUpdated] = useState(() => new Date())
+  const [tableUsers, setTableUsers] = useState(userRows)
   const [usersPage, setUsersPage] = useState(1)
   const [usersPageSize, setUsersPageSize] = useState(DEFAULT_USERS_PAGE_SIZE)
+  const [activeActionDialog, setActiveActionDialog] = useState(null)
+  const [selectedUser, setSelectedUser] = useState(null)
 
   useEffect(() => {
     const handleRouteChange = () => {
@@ -378,21 +392,49 @@ function App() {
 
   const activePage = pageDetails[activePath] ?? pageDetails['/dashboard']
   const isUsersPage = activePath === '/users'
+  const isTableActionsPage = activePath === '/TableActions'
   const isTablePage = tablePagePaths.includes(activePath)
   const isChartPage = activePath === '/Chart'
   const tableEntityLabel = isUsersPage ? 'user' : 'data'
+  const selectedUserName = selectedUser?.name ?? 'data ini'
+
+  const openActionDialog = (dialogType, user) => {
+    setSelectedUser(user)
+    setActiveActionDialog(dialogType)
+  }
+
+  const closeActionDialog = () => {
+    setActiveActionDialog(null)
+    setSelectedUser(null)
+  }
+
+  const handleEditConfirm = () => {
+    setLastUpdated(new Date())
+    closeActionDialog()
+  }
+
+  const handleDeleteConfirm = () => {
+    if (selectedUser?.userId) {
+      setTableUsers((currentUsers) =>
+        currentUsers.filter((user) => user.userId !== selectedUser.userId),
+      )
+    }
+
+    setLastUpdated(new Date())
+    closeActionDialog()
+  }
 
   const filteredUsers = useMemo(
-    () => userRows.filter((user) => userMatchesSearch(user, searchQuery)),
-    [searchQuery],
+    () => tableUsers.filter((user) => userMatchesSearch(user, searchQuery)),
+    [searchQuery, tableUsers],
   )
   const activeUsersCount = useMemo(
-    () => userRows.filter((user) => user.statusKey === 'active').length,
-    [],
+    () => tableUsers.filter((user) => user.statusKey === 'active').length,
+    [tableUsers],
   )
   const uniqueAppsCount = useMemo(
-    () => new Set(userRows.flatMap((user) => user.apps ?? [])).size,
-    [],
+    () => new Set(tableUsers.flatMap((user) => user.apps ?? [])).size,
+    [tableUsers],
   )
   const usersTotalPages = Math.max(1, Math.ceil(filteredUsers.length / usersPageSize))
   const usersCurrentPage = Math.min(usersPage, usersTotalPages)
@@ -433,14 +475,14 @@ function App() {
         key: 'edit',
         label: 'Edit',
         icon: Edit03,
-        onClick: () => setLastUpdated(new Date()),
+        onClick: (user) => openActionDialog('edit', user),
       },
       {
         key: 'delete',
         label: 'Delete',
         icon: Trash03,
         variant: 'danger',
-        onClick: () => setLastUpdated(new Date()),
+        onClick: (user) => openActionDialog('delete', user),
       },
     ],
     [],
@@ -452,7 +494,7 @@ function App() {
         return [
           {
             ...activePage,
-            value: String(userRows.length),
+            value: String(tableUsers.length),
           },
           {
             title: 'Active Users',
@@ -485,7 +527,7 @@ function App() {
         },
       ]
     },
-    [activePage, activeUsersCount, isTablePage, uniqueAppsCount],
+    [activePage, activeUsersCount, isTablePage, tableUsers.length, uniqueAppsCount],
   )
 
   const shellClassName = [
@@ -565,41 +607,63 @@ function App() {
                     <p className="users-table-card__description">
                       {isUsersPage
                         ? 'Template data table untuk daftar user internal, akses aplikasi, dan detail account.'
+                        : isTableActionsPage
+                          ? 'Template data table dengan kolom Action berisi tombol icon-only untuk edit dan delete.'
                         : 'Template data table reusable dengan pencarian, detail row, action, dan pagination.'}
                     </p>
                   </div>
 
-                  <button
-                    type="button"
-                    className="users-table-card__action"
-                    onClick={() => setLastUpdated(new Date())}
-                  >
-                    <Users01 size={18} aria-hidden="true" />
-                    <span>{isUsersPage ? 'Tambah User' : 'Tambah Data'}</span>
-                  </button>
+                  <div className="users-table-card__actions">
+                    <ButtonRangeDate />
+                    <button
+                      type="button"
+                      className="users-table-card__action"
+                      onClick={() => setLastUpdated(new Date())}
+                    >
+                      <Users01 size={18} aria-hidden="true" />
+                      <span>{isUsersPage ? 'Tambah User' : 'Tambah Data'}</span>
+                    </button>
+                    <ButtonMain />
+                  </div>
                 </div>
 
-                <DataTable
-                  rows={paginatedUsers}
-                  columns={userTableColumns}
-                  getRowId={(user) => user.userId}
-                  tableLabel={`${activePage.title} table`}
-                  emptyMessage={
-                    searchQuery
-                      ? 'Data tidak ditemukan. Coba pakai kata kunci lain.'
-                      : 'Belum ada data.'
-                  }
-                  detail={{
-                    columnLabel: 'Detail',
-                    buttonLabel: 'Detail',
-                    eyebrow: 'User detail',
-                    title: (user) => user.name,
-                    description: (user) => `${user.role} - ${user.department}`,
-                    sections: getUserDetailSections,
-                  }}
-                  actions={userTableActions}
-                  pagination={usersPagination}
-                />
+                {isTableActionsPage ? (
+                  <DataTableAction
+                    rows={paginatedUsers}
+                    columns={userTableColumns}
+                    actions={userTableActions}
+                    getRowId={(user) => user.userId}
+                    tableLabel={`${activePage.title} table`}
+                    emptyMessage={
+                      searchQuery
+                        ? 'Data tidak ditemukan. Coba pakai kata kunci lain.'
+                        : 'Belum ada data.'
+                    }
+                    pagination={usersPagination}
+                  />
+                ) : (
+                  <DataTable
+                    rows={paginatedUsers}
+                    columns={userTableColumns}
+                    getRowId={(user) => user.userId}
+                    tableLabel={`${activePage.title} table`}
+                    emptyMessage={
+                      searchQuery
+                        ? 'Data tidak ditemukan. Coba pakai kata kunci lain.'
+                        : 'Belum ada data.'
+                    }
+                    detail={{
+                      columnLabel: 'Detail',
+                      buttonLabel: 'Detail',
+                      eyebrow: 'User detail',
+                      title: (user) => user.name,
+                      description: (user) => `${user.role} - ${user.department}`,
+                      sections: getUserDetailSections,
+                    }}
+                    actions={userTableActions}
+                    pagination={usersPagination}
+                  />
+                )}
               </section>
             ) : isChartPage ? (
               <section className="chart-page" aria-label="Chart">
@@ -674,6 +738,24 @@ function App() {
           </div>
         </main>
       </div>
+
+      <DialogEdit
+        isOpen={activeActionDialog === 'edit'}
+        eyebrow="Edit Data"
+        title={`Edit ${selectedUserName}`}
+        user={selectedUser}
+        onClose={closeActionDialog}
+        onConfirm={handleEditConfirm}
+      />
+
+      <DialogDelete
+        isOpen={activeActionDialog === 'delete'}
+        eyebrow="Delete Data"
+        title={`Delete ${selectedUserName}`}
+        user={selectedUser}
+        onClose={closeActionDialog}
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   )
 }

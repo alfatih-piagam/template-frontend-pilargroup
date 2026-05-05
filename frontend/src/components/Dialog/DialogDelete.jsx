@@ -3,11 +3,13 @@ import { createPortal } from 'react-dom'
 
 import { XClose } from '../template/TemplateIcons.jsx'
 
-function DialogAction({
+function DialogDelete({
   isOpen = false,
-  eyebrow = 'Dialog',
-  title = 'Tombol',
+  eyebrow = 'Delete Data',
+  title = 'Delete Data',
+  user = null,
   onClose,
+  onConfirm,
 }) {
   useEffect(() => {
     if (!isOpen) {
@@ -41,13 +43,13 @@ function DialogAction({
         className="dashboard-popup"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="dialog-action-title"
+        aria-labelledby="dialog-delete-title"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="dashboard-popup__header">
           <div>
             <p className="dashboard-popup__eyebrow">{eyebrow}</p>
-            <h2 className="dashboard-popup__title" id="dialog-action-title">
+            <h2 className="dashboard-popup__title" id="dialog-delete-title">
               {title}
             </h2>
           </div>
@@ -62,7 +64,31 @@ function DialogAction({
           </button>
         </div>
 
-        <div className="dashboard-popup__body" />
+        <div className="dashboard-popup__body">
+          <p className="dashboard-popup__text">
+            Apakah Anda yakin ingin menghapus <strong>{user?.name ?? 'item ini'}</strong>?
+          </p>
+          <p className="dashboard-popup__text">
+            Tindakan ini akan menghilangkan data dari tabel aktif.
+          </p>
+        </div>
+
+        <div className="dashboard-popup__actions">
+          <button
+            type="button"
+            className="dashboard-popup__button dashboard-popup__button--secondary"
+            onClick={onClose}
+          >
+            Batal
+          </button>
+          <button
+            type="button"
+            className="dashboard-popup__button dashboard-popup__button--danger"
+            onClick={() => onConfirm?.(user)}
+          >
+            Delete
+          </button>
+        </div>
       </div>
     </div>
   )
@@ -70,4 +96,4 @@ function DialogAction({
   return createPortal(dialogNode, document.body)
 }
 
-export default DialogAction
+export default DialogDelete

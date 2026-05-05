@@ -1,21 +1,5 @@
 import RangeDateWithPreset from './RangeDateWithPreset.jsx'
 
-function parseDateValue(value) {
-  const [year, month, day] = String(value).split('-').map(Number)
-
-  if (!year || !month || !day) {
-    return null
-  }
-
-  const date = new Date(year, month - 1, day)
-
-  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
-    return null
-  }
-
-  return date
-}
-
 function toInputDate(date) {
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
