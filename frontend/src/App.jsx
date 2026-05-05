@@ -609,7 +609,7 @@ function App() {
                         ? 'Template data table untuk daftar user internal, akses aplikasi, dan detail account.'
                         : isTableActionsPage
                           ? 'Template data table dengan kolom Action berisi tombol icon-only untuk edit dan delete.'
-                        : 'Template data table reusable dengan pencarian, detail row, action, dan pagination.'}
+                          : ''}
                     </p>
                   </div>
 
