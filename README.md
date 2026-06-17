@@ -1,7 +1,6 @@
 # Nama Proyek Anda
 
 Deskripsi singkat tentang apa yang dilakukan oleh aplikasi ini dan masalah apa yang diselesaikannya.
-
 ## 🚀 Fitur Utama
 
 - **Cepat & Ringan**: Dibangun di atas Vite untuk performa pengembangan yang maksimal.
